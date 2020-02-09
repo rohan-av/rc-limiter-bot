@@ -138,6 +138,14 @@ bot.onText(/\/status/, msg => {
   });
 });
 
+bot.onText(/\/help/, msg => {
+  bot.sendMessage(
+    msg.chat.id,
+    "The following are the commands you can use: \n\n1. /capacity - informs you how many more diners can sit in the DH.\n2. /enter - enters the DH(and informs you if unsuccessful) \n3. /leave - leaves the DH(and informs you if unsuccessful.\n4. /status - gives your current status(including the amount of time left to eat).\n5. /help - retrieves the list of commands.",
+    { parse_mode: "Markdown" }
+  );
+});
+
 function stateOutput() {
   return `There can be *${capacity}* more diners in the DH, and *${takeaway_capacity}* more diners for takeaway. `;
 }
