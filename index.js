@@ -1,7 +1,16 @@
 const constants = require("./const_values");
 const TelegramBot = require("node-telegram-bot-api");
+const express = require("express");
+const bodyParser = require("body-parser");
 
-const bot = new TelegramBot(constants.API_TOKEN, { polling: true });
+const token = process.env.API_TOKEN;
+
+if (process.env.NODE_ENV === "production") {
+  const bot = new TelegramBot(token);
+  bot.setWebHook(process.env.HEROKU_URL + bot.token);
+} else {
+  const bot = new TelegramBot(token, { polling: true });
+}
 
 const HERE = constants.HERE;
 const TO_GO = constants.TO_GO;
@@ -206,3 +215,14 @@ function getTime() {
   let now = new Date();
   return now.getHours() * 60 + now.getMinutes();
 }
+
+const app = express();
+
+app.use(bodyParser.json());
+
+app.listen(process.env.PORT);
+
+app.post("/" + bot.token, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
