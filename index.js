@@ -3,15 +3,18 @@ const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const bodyParser = require("body-parser");
 
+const app = express();
+
 require("dotenv").config();
 
 const token = process.env.API_TOKEN;
+let bot;
 
 if (process.env.NODE_ENV === "production") {
-  const bot = new TelegramBot(token);
+  bot = new TelegramBot(token);
   bot.setWebHook(process.env.HEROKU_URL + bot.token);
 } else {
-  const bot = new TelegramBot(token, { polling: true });
+  bot = new TelegramBot(token, { polling: true });
 }
 
 const HERE = constants.HERE;
@@ -29,12 +32,6 @@ bot.onText(/\/start/, msg => {
   let output_text =
     "Hello! I am the RCLimitBot, developed inhouse for the electronic handling of capacity constraints in the dining hall. The following are the commands you can use:\n\n1. /capacity - informs you how many more diners can sit in the DH.\n2. /enter - enters the DH (and informs you if unsuccessful)\n3. /leave - leaves the DH (and informs you if unsuccessful.\n4. /status - gives your current status (including the amount of time left to eat).\n5. /help - retrieves the list of commands.";
   bot.sendMessage(msg.chat.id, output_text);
-});
-
-bot.onText(/\/echo (.+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const resp = match[1];
-  bot.sendMessage(chatId, resp);
 });
 
 bot.onText(/\/capacity/, msg => {
@@ -217,8 +214,6 @@ function getTime() {
   let now = new Date();
   return now.getHours() * 60 + now.getMinutes();
 }
-
-const app = express();
 
 app.use(bodyParser.json());
 
